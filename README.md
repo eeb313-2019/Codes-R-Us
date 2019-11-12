@@ -14,15 +14,15 @@ C. Barnes, D. M. Bethea, R. D. Brodeur, J. Spitz, V. Ridoux, C. Pusineri, B. C. 
 
 ### Gloria Gao
 
-Skills:
+Skills: dplyr, presentation organization.
 
-Responsibilities:
+Responsibilities: Data organization and pulling together a presentation.
 
 ### Sebastian Scott
 
-Skills: Dplyr, Mathematical Modeling
+Skills: dplyr, mathematical Modeling.
 
-Responsible for modeling and data analysis. 
+Responsibilities: Modeling and data analysis. 
 
 ### Josh teNyenhuis
 
@@ -30,8 +30,8 @@ Skills: Plotting, writing, and problem solving.
 
 Responsibilities: Create a beautiful report and keep the big picture in mind.
 
-### Mariel Terebiznek
+### Mariel Terebiznik
 
-Skills:
+Skills: Writing, presenting.
 
-Responsibilities:
+Responsibilities: Editing final report, motivator.
