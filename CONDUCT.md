@@ -5,7 +5,7 @@ Our Standards of Behaviour
 - No plagiarism
 - No harrasment following human rights laws outlined by the Canadian government
 - Each team member will contribute equally and to the best of their abilities to the project
-- Functions, vectors, and variables will be given proper descriptive names, following naming rules outlined by R. 
+- Functions, vectors, and variables will be given proper descriptive names, following styling rules outlined by R
 - All plots will be made with theme_classic()
 
 The organizer of the meeting (see Responsibilities) is in charge of upholding the code of conduct during each work period.
