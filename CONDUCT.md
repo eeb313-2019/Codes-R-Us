@@ -1,4 +1,3 @@
-
 ## Code of Conduct
 
 Our Standards of Behaviour
@@ -25,12 +24,10 @@ At the end of each work period
   2. Determine to-do list for next work period
   
 **Schedule**
-Meeting   Leader,      Recorder,    Organizer,   'Day off'
-1         Gloria,      Mariel,      Josh,         Sebastian
-2         Sebastian,   Gloria,     Mariel,       Josh
-3         Josh,        Sebastian,   Gloria,       Mariel
-4         Mariel,      Josh,        Sebastian,    Gloria
-
+Meeting 1 Leader: Gloria, Recorder: Mariel, Organizer: Josh, 'Day off': Sebastian
+Meeting 2 Leader: Sebastian, Recorder: Gloria, Organizer: Mariel, 'Day off': Josh
+Meeting 3 Leader: Josh, Recorder: Sebastian, Organizer: Gloria, 'Day off': Mariel
+Meeting 4 Leader: Mariel, Recorder: Josh, Organizer: Sebastian, 'Day off': Gloria
 
 ## Resolving Conflict
 Should conflict or debate arise, the matter will be settled by democratic vote.
