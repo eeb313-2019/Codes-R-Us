@@ -34,4 +34,4 @@ Responsibilities: Create a beautiful report and keep the big picture in mind.
 
 Skills: Writing, presenting.
 
-Responsibilities: Editing final report, motivator.
+Responsibilities: Editing final report, motivator
