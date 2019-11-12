@@ -26,7 +26,8 @@ C. Barnes, D. M. Bethea, R. D. Brodeur, J. Spitz, V. Ridoux, C. Pusineri, B. C. 
 ### Gloria Gao
 
 ### Sebastian Scott
-
+Skills: Dplyr, Mathematical Modeling
+Responsible for modeling and data analysis. 
 ### Josh teNyenhuis
 
 Skills: Plotting and encouraging others
