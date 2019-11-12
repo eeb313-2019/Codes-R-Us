@@ -6,6 +6,7 @@ Our Standards of Behaviour
 - Each team member will contribute equally and to the best of their abilities to the project
 - Functions, vectors, and variables will be given proper descriptive names, following styling rules outlined by R
 - All plots will be made with theme_classic()
+- For a pull request to occur, each member must approve it with their given emoji (Josh = confetti, Gloria = eyes, Mariel = rocket, Sebastian = thumbs up)
 
 The organizer of the meeting (see Responsibilities) is in charge of upholding the code of conduct during each work period.
 
@@ -25,8 +26,11 @@ At the end of each work period
   
 **Schedule**
 Meeting 1 Leader: Gloria, Recorder: Mariel, Organizer: Josh, 'Day off': Sebastian
+
 Meeting 2 Leader: Sebastian, Recorder: Gloria, Organizer: Mariel, 'Day off': Josh
+
 Meeting 3 Leader: Josh, Recorder: Sebastian, Organizer: Gloria, 'Day off': Mariel
+
 Meeting 4 Leader: Mariel, Recorder: Josh, Organizer: Sebastian, 'Day off': Gloria
 
 ## Resolving Conflict
