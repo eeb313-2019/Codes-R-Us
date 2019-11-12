@@ -25,10 +25,24 @@ C. Barnes, D. M. Bethea, R. D. Brodeur, J. Spitz, V. Ridoux, C. Pusineri, B. C. 
 -bibliography of group members:  skills and responsibilities
 ### Gloria Gao
 
+Skills:
+
+Responsibilities:
+
 ### Sebastian Scott
+
+Skills:
+
+Responsibilities:
 
 ### Josh teNyenhuis
 
-Skills: Plotting and encouraging others
+Skills: Plotting, writing, and problem solving.
+
+Responsibilities: Create a beautiful report and keep the big picture in mind.
 
 ### Mariel Terebiznek
+
+Skills:
+
+Responsibilities:
