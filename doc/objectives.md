@@ -1,3 +1,2 @@
 # Study objectivves
-- How are trophic levels more or less complex with species richness
-- 
+- Are more complex communities betwen trophic levels have more complex interactions?
