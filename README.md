@@ -31,9 +31,8 @@ Responsibilities:
 
 ### Sebastian Scott
 
-Skills:
-
-Responsibilities:
+Skills: Dplyr, Mathematical Modeling
+Responsible for modeling and data analysis. 
 
 ### Josh teNyenhuis
 
