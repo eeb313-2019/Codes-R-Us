@@ -25,14 +25,14 @@ At the end of each work period
   2. Determine to-do list for next work period
   
 **Schedule**
-Meeting   Leader      Recorder    Organizer   'Day off'
-1         Gloria      Mariel      Josh         Sebastian
-2         Sebastian   Gloria      Mariel       Josh
-3         Josh        Sebastian   Gloria       Mariel
-4         Mariel      Josh        Sebastian    Gloria
+Meeting   Leader,      Recorder,    Organizer,   'Day off'
+1         Gloria,      Mariel,      Josh,         Sebastian
+2         Sebastian,   Gloria,     Mariel,       Josh
+3         Josh,        Sebastian,   Gloria,       Mariel
+4         Mariel,      Josh,        Sebastian,    Gloria
 
 
 ## Resolving Conflict
-Should conflict or debate arise, the matter will be settled by democratic vote
-Should the vote be a tie, the leader of the day will decide the outcome
-If the conflict becomes a reoccuring issue, course instructors will be consulted
+Should conflict or debate arise, the matter will be settled by democratic vote.
+Should the vote be a tie, the leader of the day will decide the outcome.
+If the conflict becomes a reoccuring issue, course instructors will be consulted.
