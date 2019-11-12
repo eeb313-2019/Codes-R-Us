@@ -1,4 +1,4 @@
-## Code of Conduct
+## Code of Conduct Final
 
 Our Standards of Behaviour
 - No plagiarism
