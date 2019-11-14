@@ -2,19 +2,19 @@
 
 1) Do more diverse communities have more complex trophic interactions?
 
-Simpson's diversity index can be used to determine diversity for each geographic location. Food webs will be created from the "Rfood-web" package. Complexity of the food web will based on number of connections.
+Simpson's diversity index can be used to determine diversity for each geographic location. To organize our data, we will need to create a table with all the species in one column and abundance for each in another, with a final column indicating geographic location. Food webs will be created from the "Rfood-web" package. Complexity of the food web will based on number of connections.
 
 2) Is the ratio between predator and prey mass (and their variation) constant through life stages?
 
-A possible analysis that could be used is ANOVA between predator/prey mass for adults and juveniles.
+To organize our data, we will create a table with columns life stage, predator species and mass, and prey species and their mass. A possible analysis that could be used is ANOVA between predator/prey mass for adults and juveniles.
 
 3) Does animal size (mass and length) change with latitude?
 
-We would use a linear model. Fixed effects would be mass, random effects include depth, predator/prey, and feeding type.
+To organize our data, we will create a table with columns latitude, species, and mass of species. Another table with the same columns, except looking at length instead. We will add columns to these tables for the random effects tested. We will use a linear model, where fixed effects will be mass, random effects include depth, predator/prey, and feeding type.
 
 4) How do total abundance and species abundance change with depth?
 
-We would use a linear model. Fixed effects would be abundance, random effects include latitude, predator/prey, and feeding type.
+To organize our data, we will create a table with columns depth, species, and abundance of each species. We will use a linear model. Fixed effects will be abundance, random effects include latitude, predator/prey, and feeding type.
 
 # Possible results tables
 
@@ -28,11 +28,11 @@ The output table of the ANOVA, including relationship and strength.
 
 3) Does animal size (mass and length) change with latitude?
 
-We would make a table of a variety of models using various random effects, and compare AIC values.
+We will make a table of a variety of models using various random effects, and compare AIC values.
 
 4) How do total abundance and species abundance change with depth?
 
-We would make a table of a variety of models using various random effects, and compare AIC values.
+We will make a table of a variety of models using various random effects, and compare AIC values.
 
 # Possible results figures
 
