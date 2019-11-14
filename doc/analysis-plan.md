@@ -10,7 +10,7 @@ To organize our data, we will create a table with columns: life stage, predator 
 
 3) Does animal size (mass and length) change with latitude?
 
-To organize our data, we will create a table with columns: latitude, species, and mass of species. An additinoal table will be made with the same columns, but with species length instead of mass. We will add columns to these tables for the random effects tested. We will use a linear model, where fixed effects will be mass, random effects include depth, predator/prey, and feeding type.
+To organize our data, we will create a table with columns: latitude, species, and mass of species. An additional table will be made with the same columns, but with species length instead of mass. We will add columns to these tables for the random effects tested. We will use a linear model, where fixed effects will be mass, random effects include depth, predator/prey, and feeding type.
 
 4) How do total abundance and species abundance change with depth?
 
