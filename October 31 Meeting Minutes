@@ -1,1 +1,36 @@
+October 31 Meeting Minutes
 
+Data taken
+1. Predator                              2. Prey                3. Environment
+    - name                                    - name                - geographic location
+    - lifestage                               - length              - longitude
+    - length (standard, total)                - width               - latitude
+    - fork length                             - mass                - depth
+    - diet coverage                           - taxon               - temperature
+    - taxon                                                         - precipitation
+    - feeding interaction type
+    - mass
+
+Possible questions to ask:
+1. Biogeography: in oceans, life is most diverse/abundant in the poles instead of the tropics
+2. Build a food web of a certain location
+3. Larger predators eat larger prey
+4. Bergmann's rule: expect larger animals near the poles
+5. How are size and depth related
+6. How are fork length and depth related
+7. Lifestage and prey type
+8. How interactions (predator-prey) change by environmental factors
+9. How size ratios change with eating habitats and location
+10. Predator length scales with prey length, same for width and mass
+11. Latitude or location and abundance of predator/prey
+12. Diversity in predator/prey size as a function of latitude and environment
+13. Length to mass ratio with latitude
+14. Length to mass ratio with depth
+15. Reconstruct a food web
+
+Jobs:
+
+Sebastian: life stage stuff
+Josh: predator prey interactions based on size
+Gloria: Location
+Mariel: Food web
