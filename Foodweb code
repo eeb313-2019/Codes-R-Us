@@ -1,0 +1,153 @@
+## Introduction
+
+To create a food web in R, we will be using the foodweb package. 
+
+The package requires a binary matrix where:
+
+  1. row n species is equal to column n species
+  
+  2. 0 is equal to no interaction
+  
+  3. 1 is equal to column eats row
+  
+  4. Converted to text file with commas as separaters
+
+
+
+## Creating the matrix
+
+#### Getting a list of species
+```{r}
+# Function extract predators or prey
+get_trophic <- function(data, location, trophic){
+  data_trophic <- data %>% 
+    filter(`Geographic location` == location)
+
+  if(trophic == "Prey"){
+    data_trophic <- data_trophic %>% 
+      dplyr::select(Prey) %>% 
+      unique 
+    
+    prey <- as.vector(data_trophic$Prey)
+    return(prey)
+  }
+  
+  if(trophic == "Predator"){
+    data_trophic <- data_trophic %>% 
+      dplyr::select(Predator) %>% 
+      unique 
+    
+    pred <- as.vector(data_trophic$Predator)
+    return(pred)
+  }
+}
+
+# Test
+get_trophic(aquamarine, "Antarctic Peninsula", "Predator")
+```
+
+```{r}
+# Get all species from a location
+get_species <- function(data, location) {
+  pred <- get_trophic(data, location, "Predator")
+  prey <- get_trophic(data, location, "Prey")
+  
+  species <- union(pred, prey)
+  return(species)
+}
+
+
+# Test
+get_species(aquamarine, "Antarctic Peninsula")
+```
+
+
+#### Getting list of prey for each predator
+
+```{r}
+# Get prey items of a predator
+get_prey <- function(data, location, predator){
+  
+  prey_data <- data %>% 
+    filter(`Geographic location` == location) %>% 
+    dplyr::select(Predator, Prey) %>% 
+    dplyr::filter(Predator == predator) %>% 
+    unique
+  
+  prey <- as.vector(prey_data$Prey)
+  return(prey)
+}
+
+
+# Test
+get_prey(aquamarine, "Antarctic Peninsula", "Nototheniops larseni")
+```
+
+
+#### Creating the empty matrix
+
+```{r}
+# Create empty matrix for a location
+
+make_matrix <- function(data, location){
+  sp <- get_species(data, location)
+  m <- matrix(0L, nrow = length(sp), ncol = length(sp))
+  rownames(m) <- sp
+  colnames(m) <- sp
+  return(m)
+}
+
+```
+
+#### Filling in the matrix
+
+```{r}
+
+fill_matrix <- function(data, location){
+  
+  # Create matrix
+  m <- make_matrix(data, location)
+  
+  # Get list of predators
+  predators <- get_trophic(data, location, "Predator")
+  
+  # for each predator
+  for(pred in predators){
+    
+    #Get its prey species
+    prey_species <- get_prey(aquamarine, location, pred)
+    
+    # Assign each value of matrix[prey, predator] = 1
+    for(prey in prey_species){
+      m[prey, pred] = 1
+    }
+  }
+  return(m)
+}
+
+
+# Test
+fill_matrix(aquamarine, "Antarctic Peninsula")
+```
+
+
+## Creating the food web and analysing diversity
+
+```{r}
+# The matrix file
+mat <- fill_matrix(aquamarine, "Antarctic Peninsula")
+
+# Converting to txt file
+write.table(mat, file="mymatrix.txt", row.names=FALSE, col.names=FALSE, sep = ",") # saved in directory
+
+# analyse interactions
+analyse.single(filename="mymatrix.txt")
+
+# reading results of analyse signal
+results <- read_csv("Results-mymatrix.txt")
+
+# plot web
+plotweb(col=c("red", "green", "blue"), radii=c(5,5, 5))
+    # will need to change col and radii for number of interactions (see results)
+
+
