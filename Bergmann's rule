@@ -1,0 +1,229 @@
+# EEB313 Codes 'R' Us Final Project Code
+
+### Read in packages
+
+```{r}
+library(tidyverse)
+library(readr)
+library(broom)
+library(sp)
+```
+
+### Read in file
+
+```{r}
+aquamarine <- read_csv("aquamarine 2.csv")
+```
+
+# Bergmann's Rule
+
+Does animal size (mass) change with latitude?
+
+1. Organize data into table with columns: latitude, species, mass of species
+2. Convert latitude column into numeric
+3. Plot latitude against mass and look for relationship
+4. Create linear models
+
+## Data exploration
+
+```{r}
+aquamarine %>% 
+  distinct(`Predator common name`) %>% 
+  count()
+
+aquamarine %>% 
+  distinct(Latitude)
+
+aquamarine %>% 
+  count(`Predator common name`)
+  
+# 87 species (predators)
+# 27 measurements of latitudes
+```
+
+## Convert latitude column into numeric
+
+```{r}
+chd <-  substr(aquamarine$Latitude, 3, 3)[1]
+chm <-  substr(aquamarine$Latitude, 6, 6)[1]
+
+cd <-  char2dms(aquamarine$Latitude, chd = chd, chm = chm)
+
+num_latitude <- abs(as.numeric(cd))
+aquamarine$Latitude <- num_latitude
+
+# Check the conversion worked
+
+class(aquamarine$Latitude) 
+```
+
+## Plot latitude against mass and look for relationship 
+
+In order to do this, we need to take predator lifestage into account, and compare species accross lifestages.
+
+```{r}
+# first, in coloumn `Predator lifestage`, change data entries "Adult" to "adult":
+
+aquamarine %>% 
+  select(`Predator lifestage`) %>% 
+  distinct()
+
+aquamarine$`Predator lifestage`[aquamarine$`Predator lifestage` == "Adult"] <- "adult"
+```
+
+## Group species by latitude and lifestage, and finding mean mass of those species:
+
+```{r}
+# Calculating mean mass of each species at each latitude
+aquamarine %>%
+  select(Latitude, `Predator common name`, `Predator mass`, `Predator lifestage`) %>% 
+  group_by(Latitude, `Predator common name`, `Predator lifestage`) %>% 
+  summarise(mean_mass = mean(`Predator mass`))
+
+# Sample size for each lifestage
+aquamarine %>% 
+  filter(`Predator lifestage` == c("adult", "juvenile", "larva", "larva / juvenile")) %>% 
+  group_by(`Predator lifestage`) %>% 
+  count()
+```
+
+## Log-transformed plot
+
+```{r}
+aquamarine %>%
+  select(Latitude, `Predator common name`, `Predator mass`, `Predator lifestage`) %>% 
+  filter(`Predator lifestage` == c("adult", "juvenile", "larva", "larva / juvenile")) %>% 
+  group_by(Latitude, `Predator common name`, `Predator lifestage`) %>% 
+  summarise(mean_mass = mean(`Predator mass`)) %>% 
+  ggplot(aes(x = Latitude, y = mean_mass, colour = `Predator lifestage`)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  scale_y_log10() +
+  theme_classic() +
+  ylab("Standardized Mean Mass (kg)")
+  
+ # Adult, juvenile, and larva/juvenile lifestages do not seem to follow Bergmann's rule; negative relationships are observed instead of positive. 
+ # We can clearly see sampling is not even across latitude, with lots of data points clustered at Latitude 40 and 50, but few between Latitudes between 15 and 25.
+ # Since there is non-independence of observations, we should run a separate analysis for each lifestage. 
+```
+
+```{r}
+# Run linear model of Mass against Latitude for each lifestage
+model_1 <- aquamarine %>% 
+  select(`Predator lifestage`, `Predator common name`, Latitude, `Predator mass`) %>% 
+  filter(`Predator lifestage` == c("adult", "juvenile", "larva", "larva / juvenile")) %>%
+  group_by(Latitude, `Predator common name`, `Predator lifestage`) %>% 
+  summarise(mean_mass = mean(`Predator mass`)) %>% 
+  dplyr::rename(pred_name = `Predator common name`) %>%
+  dplyr::rename(pred_lifestage = `Predator lifestage`) %>% 
+  group_by(`pred_lifestage`) %>% 
+  do(mod = lm(`mean_mass` ~ Latitude, data = .))
+
+# Get the coefficients by group in a tidy data_frame
+df_models = tidy(model_1, mod)
+
+df_models %>% 
+  filter(term == "Latitude") %>% 
+  dplyr::select(estimate, p.value)
+
+# Juvenile is the only lifestage that has a significant p-value, but shows a negative relationship (as Latitude increases, mass decreases). 
+# Larva is the only lifestage that demonstrates Bergmann's rule, but does not have a significant p-value.
+# Perhaps a better approach would be see if individual species follow Bergmann's rule.
+
+```
+
+## Find species that are sampled at two different latitudes and look for a relationship between mass and latitude.
+
+```{r}
+# Range of latitude that species are sampled
+aquamarine %>% 
+  select(`Predator common name`, Latitude, `Predator lifestage`) %>% 
+  distinct() %>% 
+  group_by(`Predator common name`, `Predator lifestage`) %>% 
+  summarise(n = n(), max = max(Latitude), min = min(Latitude)) %>% 
+  arrange(-n)
+
+aquamarine %>% 
+  select(`Predator common name`, Latitude) %>% 
+  distinct() %>% 
+  group_by(`Predator common name`) %>% 
+  tally() %>% 
+  arrange(-n)
+
+# Look at both code chunks and see if n columns are equal for each species. If mismatched, then that species has more than one lifestage sampled. 
+
+# Atlantic cod is found at multiple lifestages. To use only adults, change `Predator common name` to "Atlantic cod adult" in dataframe.
+
+for (row in 1:nrow(aquamarine)) {
+  if (aquamarine[row, "Predator common name"] == "Atlantic cod" && aquamarine[row, "Predator lifestage"] == "adult") {
+    aquamarine[row, "Predator common name"] <- "Atlantic cod adult"
+  }
+}
+
+# Check
+aquamarine %>% 
+  filter(`Predator common name` == "Atlantic cod adult")
+```
+Species to use:
+- Atlantic bluefin tuna
+- Atlantic cod (adult only)
+- John dory
+- Myctophidae fish larva
+- Saithe
+- Spurdog / spiny dogfish
+
+## Create new object that only includes those species and colunns 'Latitude' and 'Predator mass'
+
+```{r}
+aquamarine_species <- aquamarine %>%
+  select(Latitude, `Predator common name`, `Predator mass`) %>%
+  filter(`Predator common name` == c("Atlantic bluefin tuna", "Atlantic cod adult", "John dory", "Myctophidae fish larva", "Saithe", "Spurdog / spiny dogfish"))
+
+# Sample size for each species
+aquamarine_species %>% 
+  group_by(`Predator common name`) %>% 
+  count()
+```
+
+## Plot (log-transformed)
+
+```{r}
+aquamarine_species %>%
+  ggplot(aes(x = Latitude, y = `Predator mass`, colour = `Predator common name`)) +
+  geom_point() +
+  scale_y_log10() +
+  theme_classic() +
+  ylab("Standardized Mass (kg)")
+  
+# Observations among species are clustered because of non-independence. We can run separate analysis for each species.
+```
+
+```{r}
+aquamarine_species %>% 
+  ggplot(aes(x = Latitude, y = `Predator mass`)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  scale_y_log10() +
+  theme_classic() +
+  ylab("Standardized Mass (kg)") +
+  facet_wrap(~ `Predator common name`)
+```
+
+## Linear model
+
+```{r}
+model_2 <- aquamarine_species %>% 
+  dplyr::rename(pred_name = `Predator common name`) %>%   
+  group_by(pred_name) %>% 
+  do(mod = lm(`Predator mass` ~ Latitude, data = .))
+
+df_models = tidy(model_2, mod)
+
+df_models %>% 
+  filter(term == "Latitude") %>% 
+  dplyr::select(estimate, p.value)
+```
+Atlantic bluefin tuna and John dory show a significant positive relationship between latitude and mass. 
+Atlantic cod adult, Saithe, and Spurdog/spiny dogfish show no relationship. 
+Myctophidae fish larva show a significant negative relationship. 
+We can conclude that Bergmann's Rule can only be observed in the Atlantic bluefin tuna and John dory.
