@@ -1,7 +1,4 @@
----
-title: "R Notebook Final - Bergmann's Rule"
-output: html_notebook
----
+### Read in packages
 
 ```{r}
 library(tidyverse)
@@ -36,9 +33,11 @@ aquamarine %>%
 
 aquamarine %>% 
   count(`Predator common name`)
+  
+# 87 species (predators)
+# 27 measurements of latitudes
+
 ```
-87 species (predators)
-27 measurements of latitudes
 
 Convert Latitude column into numeric:
 ```{r}
@@ -209,16 +208,6 @@ df_models %>%
   dplyr::select(estimate, p.value)
 ```
 Atlantic bluefin tuna and John dory show a positive significant relationship between Latitude and mass. Atlantic cod adult, Saithe, and Spurdog/spiny dogfish show no relationship. Myctophidae fish larva has a significant negative relationship. Therefore we can conclude that Bergmann's Rule can only be observed in the Atlantic bluefin tuna and John dory.
-
-
-
-
-
-
-
-
-
-
 
 
 
