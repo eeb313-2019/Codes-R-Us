@@ -28,6 +28,7 @@ aquamarine %>%
 
 ### Visualization of Data
 ```{r}
+# Predator prey versus prey mass (g) facetted for each life stage
 aquamarine %>% 
   filter(Prey.mass.unit == "g", !is.na(Prey.mass), !is.na(Predator.mass)) %>% 
   filter(Predator.lifestage == "adult" | Predator.lifestage == "juvenile" | Predator.lifestage == "larva") %>% 
