@@ -17,13 +17,14 @@ The package requires a binary matrix where:
 ## Importing the dataset
 
 ```{r}
+# Load in necessary packages
 library(readr)
 library(dplyr)
 library(foodweb)
+library(ggplot2)
 
+# Load in dataset
 aquamarine <- read_delim("aquamarine.txt", "\t", escape_double = FALSE, trim_ws = TRUE)
-
-colnames(aquamarine)
 
 View(aquamarine)
 ```
@@ -34,12 +35,19 @@ View(aquamarine)
 ## Creating the matrix
 
 #### Getting a list of species
-```{r}
-# Function extract predators or prey
-get_trophic <- function(data, location, trophic){
-  data_trophic <- data %>% 
-    filter(`Geographic location` == location)
 
+Step 1: Create a function a list of species given the data, location, and trophic level (will be used later to fill the matrix)
+
+```{r}
+# Function extract predators or prey given a location
+get_trophic <- function(data, location, trophic){
+  
+  data_trophic <- data %>% 
+    
+  # filter out by location
+    filter(`Geographic location` == location)
+    
+  # filter out by trophic level  
   if(trophic == "Prey"){
     data_trophic <- data_trophic %>% 
       dplyr::select(Prey) %>% 
@@ -59,16 +67,23 @@ get_trophic <- function(data, location, trophic){
   }
 }
 
-# Test
+# Test to see if it works
 get_trophic(aquamarine, "Antarctic Peninsula", "Predator")
 ```
+
+Step 2: Create a function that returns a list of all species at a given location (will be used later to fill the matrix)
 
 ```{r}
 # Get all species from a location
 get_species <- function(data, location) {
+
+  # list of predators
   pred <- get_trophic(data, location, "Predator")
+  
+  # list of prey
   prey <- get_trophic(data, location, "Prey")
   
+  # combine the two
   species <- union(pred, prey)
   return(species)
 }
@@ -81,16 +96,20 @@ get_species(aquamarine, "Antarctic Peninsula")
 
 #### Getting list of prey for each predator
 
+Step 3: Get a list of items a predator eats, given a location and predator (will be used later to fill the  matrix)
+
 ```{r}
 # Get prey items of a predator
 get_prey <- function(data, location, predator){
   
+  # filter for location and given predator
   prey_data <- data %>% 
     filter(`Geographic location` == location) %>% 
     dplyr::select(Predator, Prey) %>% 
     dplyr::filter(Predator == predator) %>% 
     unique
   
+  # return the names of all the prey it eats
   prey <- as.vector(prey_data$Prey)
   return(prey)
 }
@@ -103,11 +122,17 @@ get_prey(aquamarine, "Antarctic Peninsula", "Nototheniops larseni")
 
 #### Creating the empty matrix
 
+Step 4: Create an empty matrix that contains n rows and n columns, where n is the number of species present in a given location
+
 ```{r}
 # Create empty matrix for a location
 
 make_matrix <- function(data, location){
+
+  # get all the species of location using function created in step 2
   sp <- get_species(data, location)
+  
+  # create matrix where n column represents the same species as n row
   m <- matrix(0L, nrow = length(sp), ncol = length(sp))
   rownames(m) <- sp
   colnames(m) <- sp
@@ -118,20 +143,22 @@ make_matrix <- function(data, location){
 
 #### Filling in the matrix
 
+Step 5: Fill the matrix with values corresponding to predation events in a given location
+
 ```{r}
 
 fill_matrix <- function(data, location){
   
-  # Create matrix
+  # Create matrix using function from step 4
   m <- make_matrix(data, location)
   
-  # Get list of predators
+  # Get list of predators using function from step 1
   predators <- get_trophic(data, location, "Predator")
   
-  # for each predator
+  # for each predator 
   for(pred in predators){
     
-    #Get its prey species
+    #Get its prey species using function from step 3
     prey_species <- get_prey(aquamarine, location, pred)
     
     # Assign each value of matrix[prey, predator] = 1
@@ -149,6 +176,8 @@ fill_matrix(aquamarine, "Antarctic Peninsula")
 
 
 ## Creating the food web and analysing diversity
+
+Below is exploratory code from trying to figure out how to analyse each matrix specifically. This is automated further down in the file
 
 ```{r}
 # The matrix file
@@ -170,7 +199,9 @@ plotweb(col=c("red", "green", "blue"), radii=c(5,5, 5))
 ```
 
 
-# Function to get interactions for each site
+## Function to get interactions for each site
+
+Step 7: Create a function that returns a dataframe with number of links (L), connectance (C), and species richness (SR) for a given location
 
 ```{r}
 interactions <- function(data, location) {
@@ -201,6 +232,9 @@ interactions <- function(data, location) {
 
 
 ## Get the interactions for each site
+
+Step 8: Create a dataframe with the food web complexity metrics for each location
+
 ```{r}
 sites <- as.vector(unique(aquamarine$`Geographic location`)) # vector for all the sites
 inter <- data.frame() # data frame to hold interactions
@@ -221,6 +255,8 @@ inter
 
 ## Testing for Normality in the dataset
 
+Step 9: Test for normality to be able to run linear models
+
 ```{r}
 # Connectance
 shapiro.test(inter$C)
@@ -237,21 +273,26 @@ All of these results were significant, therefore none of them exhibit normality.
 
 
 # Plots
-```{r}
 
+```{r}
 # Link-scaling species law assumption 1
+
   # SR is inversely proportional to connectance
+  
 ggplot(aes(x = SR, y = 1/C), data = inter) +
   geom_point() +
   theme_classic() +
   geom_smooth(method = "lm")
   
  # Linear model to test it
+ 
  summary(lm(1/C ~ SR, data = inter)) # significant; although does not follow normality assumption
  
  
  # Link scaling law versus constant connectance
+ 
     # 2 predator-prey interactions (L) per SR versus increasing predator-prey interactions per SR
+    
  ggplot(aes(x = SR, y = L), data = inter) +
   geom_point(size = 2) +
   geom_smooth(method = "lm") +
@@ -264,13 +305,16 @@ ggplot(aes(x = SR, y = 1/C), data = inter) +
   geom_vline(xintercept=40, linetype="dashed", color = "darkgreen", alpha = 0.5, size = 1)
   
   # Linear model
+  
   summary(lm(L~SR, data = inter)) # significant; although does not follow normality assumption
+  
       # estimate = 2.6 ~ link scaling species law
       
   ```
   
   
   # Does food web complexity decrease with increasing latitude
+  
   ```{r}
   # Use dataset with transformed Latitude from Gloria
   aqua_lat <- aquamarine_lat %>% 
