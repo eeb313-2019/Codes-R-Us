@@ -37,6 +37,10 @@ Skills: Writing, presenting.
 Responsibilities: Editing final report, motivator
 
 
+# Contents 
+
+Master contains 3 separate code files, Bergmann's rule, Predator Prey interactions, and Food webs.
+
 # Contents of folders
 
 The first page of the Codes R Us Github repository has:
