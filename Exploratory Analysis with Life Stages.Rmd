@@ -1,41 +1,29 @@
----
-title: "EEB313 Project Exploratory Analysis"
-output: html_document
-author: Se[B]astian
----
-### Load Packages
+### Load required packages
+
 ```{r}
 library(dplyr)
 library(ggplot2)
 library(lme4)
 ```
 
-
+### Read in dataset
 
 ```{r}
 aquamarine = read.delim("Predator_and_prey_body_sizes_in_marine_food_webs_vsn4.txt")
 aquamarine
 ```
 
+### How many representatives from each life stage?
 
-### Life Stage Tally
 ```{r}
 aquamarine %>% 
   group_by(Predator.lifestage) %>% 
   tally()
 ```
 
+### Exploratory plots
 
-### Visualization of Data
-```{r}
-# Predator prey versus prey mass (g) facetted for each life stage
-aquamarine %>% 
-  filter(Prey.mass.unit == "g", !is.na(Prey.mass), !is.na(Predator.mass)) %>% 
-  filter(Predator.lifestage == "adult" | Predator.lifestage == "juvenile" | Predator.lifestage == "larva") %>% 
-  ggplot(aes(x = Predator.mass, y = Prey.mass,colour = Type.of.feeding.interaction)) + geom_point() + facet_wrap(~Predator.lifestage) + theme_classic()
- 
-
-```
+#### Larva and juveniles
 
 ```{r}
 aquamarine %>% 
@@ -44,12 +32,16 @@ aquamarine %>%
   ggplot(aes(x = Predator.mass, y = Prey.mass, colour = Type.of.feeding.interaction)) + geom_point() + facet_wrap(~Predator.lifestage) + theme_classic()
 ```
 
+#### Adults and juveniles
+
 ```{r}
 aquamarine %>% 
   filter(Prey.mass.unit == "g", !is.na(Prey.mass), !is.na(Predator.mass)) %>% 
   filter(Predator.lifestage == "juvenile" |Predator.lifestage == "adult") %>% 
   ggplot(aes(x = Predator.mass, y = Prey.mass, colour = Predator.lifestage )) + geom_point() + facet_wrap(~Type.of.feeding.interaction) + theme_classic()
 ```
+
+#### Juveniles by feeding interaction
 
 ```{r}
 aquamarine %>% 
@@ -58,10 +50,25 @@ aquamarine %>%
   ggplot(aes(x = Predator.mass, y = Prey.mass, colour = Predator.lifestage )) + geom_point() + facet_wrap(~Type.of.feeding.interaction) +theme_classic()
 ```
 
-### Modifying  and plotting data
+## Modifying  and plotting data
+
+### Predator mass by prey mass, facet by life stage
+
+```{r}
+# Predator prey versus prey mass (g) facetted for each life stage
+aquamarine %>% 
+  filter(Prey.mass.unit == "g", !is.na(Prey.mass), !is.na(Predator.mass)) %>% 
+  filter(Predator.lifestage == "adult" | Predator.lifestage == "juvenile" | Predator.lifestage == "larva") %>% 
+  ggplot(aes(x = Predator.mass, y = Prey.mass,colour = Type.of.feeding.interaction)) + geom_point() + facet_wrap(~Predator.lifestage) + theme_classic()
+```
+
+#### Change Adults into adults
+
 ```{r}
 aquamarine$Predator.lifestage[aquamarine$Predator.lifestage == "Adult"] <- "adult"
 ```
+
+#### Removing NAs for life stage, filter for cryptic life stages such as postlarva
 
 ```{r}
 life_history_data <- aquamarine %>% 
@@ -69,12 +76,17 @@ life_history_data <- aquamarine %>%
   filter(Predator.lifestage == "adult" | Predator.lifestage == "juvenile" | Predator.lifestage == "larva")
 ```
 
+#### Log transform data
+
 ```{r}
 life_history_data <- life_history_data %>% 
   mutate(Pred_mass_sqrt = sqrt(Predator.mass), Prey_mass_sqrt = sqrt(Prey.mass), Pred_mass_log = log(SI.predator.mass), Prey_mass_log = log(SI.prey.mass)) %>% 
   mutate (Prey_Pred_mass_l = log(SI.prey.mass/SI.predator.mass))
-
 ``` 
+
+### Exploratory plots with log transformed data
+
+#### Predator mass vs prey mass faceted by life stage
 
 ```{r}
 life_history_data %>% 
@@ -84,12 +96,15 @@ life_history_data %>%
   facet_wrap(~Predator.lifestage) + 
   theme_classic()
 ```
+#### Histogram of juveniles
 
 ```{r}
 life_history_data %>% 
   filter(Predator.lifestage == "juvenile") %>% 
   ggplot(aes(x= Pred_mass_log, fill = Predator)) + geom_histogram()
 ```
+
+### Linear model of adults
 
 ```{r}
 life_history_data_adult <- life_history_data %>% 
@@ -98,12 +113,15 @@ adult_lm <- lm(Prey_mass_log ~ Pred_mass_log , data = life_history_data_adult)
 summary (adult_lm) 
 ```
 
+### Linear model of juveniles
+
 ```{r}
 life_history_data_juvenile <- life_history_data %>% 
   filter(Predator.lifestage == "juvenile")
 summary(juvenile_lm)
 ```
 
+### Linear model of larva
 
 ```{r}
 life_history_data_larva <- life_history_data %>% 
@@ -112,6 +130,7 @@ larva_lm <- lm(Prey_mass_log ~ Pred_mass_log , data = life_history_data_larva)
 summary (larva_lm) 
 ```
 
+### Add linear models to plot
 
 ```{r fig.height=6, fig.width = 10}
 life_history_data %>% 
@@ -122,36 +141,31 @@ life_history_data %>%
   theme_classic() + labs(y="log(Prey mass) (kg)", x = "log(Predator mass) (kg)")
 ```
 
+### Basic LM
+
 ```{r}
 data_lm <- lm(Prey_mass_log ~ Pred_mass_log , data = life_history_data)
 summary(data_lm) 
 ```
+
+### Basic predator prey plots
 
 ```{r fig.height=6, fig.width = 10}
 life_history_data %>% 
   ggplot(aes(x = Pred_mass_log, y = Prey_mass_log)) +
   geom_point(alpha= 0.1) + geom_abline(slope = 0.936, intercept = -6.426, colour = "black") +
   theme_classic() + labs(y="log(Prey mass) (kg)", x = "log(Predator mass) (kg)")
-```
 
-
-```{r fig.height=6, fig.width = 10}
 life_history_data %>% 
   ggplot(aes(x = Pred_mass_log, y = Prey_mass_log, colour = Geographic.location)) +
   geom_point(alpha= 0.1) +theme_classic() + labs( x = "log(Predator mass) (kg) ", y = "log(Prey mass) (kg)")
-```
 
-
-```{r fig.height=6, fig.width = 10}
 life_history_data %>% 
   ggplot(aes(x = Pred_mass_log, y = Prey_mass_log, colour = Type.of.feeding.interaction)) +
   geom_point(alpha= 0.1) +theme_classic()
 ```
 
-
-```{r}
-life_history_data
-```
+###  Basic linear model of interaction
 
 ```{r}
 feeding_lm <- lm(Prey_mass_log ~ Pred_mass_log*Predator.lifestage , data = life_history_data)
@@ -159,12 +173,13 @@ summary(feeding_lm)
 anova(feeding_lm)
 ```
 
-
-
+### Chi square test of interaction
 
 ```{r}
 chisq.test(life_history_data$Predator.lifestage, life_history_data$Type.of.feeding.interaction)
 ```
+
+### Bar plot of interaction
 
 ```{r}
 life_history_data %>% 
@@ -172,82 +187,23 @@ life_history_data %>%
   ggplot(aes(x= Predator.lifestage, fill = Type.of.feeding.interaction)) + geom_bar() + facet_wrap(~Type.of.feeding.interaction) +theme_classic() + labs(x = "Predator Lifestage")
 ```
 
+### Random effects model accounting for geographic location
+
 ```{r}
-install.packages("MixMod")
-library(MixMod)
 feeding_lmer2 <- lmer(Prey_mass_log ~ Pred_mass_log*Predator.lifestage  + (1|Geographic.location) , data = life_history_data)
 summary(feeding_lmer2) 
-
-
 ```
 
-```{r}
-life_history_data <- life_history_data %>% 
-  mutate(taxa = "Actinopterygii")
-
-life_history_data$taxa[1:276] <- "Chondrichthyes" 
-
-life_history_data %>% 
-  filter(taxa == "Chondrichthyes")
-
-```
-
-```{r}
-life_history_data %>% 
-  ggplot(aes(x = Pred_mass_log, y = Prey_mass_log, colour = Predator.lifestage)) +
-  geom_point(alpha= 0.5) + facet_wrap(~taxa)
-  theme_classic()
-```
+### Site plot
 
 ```{r}
 life_history_data %>% 
   ggplot(aes(x = Pred_mass_log, y = Prey_mass_log, colour = Geographic.location)) +
-  geom_point(alpha= 0.5) + geom_abline(slope = 0.291296, intercept = -0.794030, colour = "red") +
-  geom_abline(slope = 0.748727, intercept = -7.318485 , colour = "green")+ 
-  geom_abline(slope =  0.40996 , intercept = -12.06791  , colour = "blue") +
+  geom_point(alpha= 0.5) + 
   theme_classic() + theme(legend.position = "bottom")
 ```
 
-
-
-## statisitcs and Plotting
-
-### Linear Model with LH stage and taxa as interactions
-
-```{r}
-lh_lm <- lm(Prey_mass_log ~ Pred_mass_log*Predator.lifestage , data = life_history_data)
-
-anova(lh_lm)
-```
-```{r}
-taxa_lm <- lmer(Prey_mass_log ~ Pred_mass_log*Predator.lifestage + (1|taxa), data = life_history_data)
-summary(taxa_lm)
-```
-
-
-
-
-
-```{r}
-library(lme4)
-lhr_lm <- lmer(Prey_Pred_mass ~ Predator.lifestage + (1|taxa), data = life_history_data)
-
-
-summary(lhr_lm)
-
-life_history_data
-```
-
-
-```{r}
-t_lm <- lm(Prey_mass_log ~ Pred_mass_log*taxa, data = life_history_data)
-summary(t_lm)
-```
-
-```{r}
-tr_lm <- lmer(Prey_Pred_mass ~ taxa + (1|Geographic.location) + (1|Geographic.location:Predator), data = life_history_data)
-summary(tr_lm)
-```
+## Statisitcs and plotting
 
 ### Normality of data
 
@@ -259,103 +215,105 @@ p2 <- ggplot(life_history_data, aes(Prey_mass_l)) + geom_histogram(fill = "white
 p3 <- ggplot(life_history_data, aes(Prey_Pred_mass_l)) + geom_histogram(bins = 50, fill = "black", colour = "grey30") +theme_classic() 
 grid.arrange(p1, p2, p3, ncol =3)
 
-p3
-
 hist(life_history_data$Prey_Pred_mass, w =5)
 ```
 
-### Normality
+### Normality of adults to use in sample
 
 ```{r}
+# There are so many data points that need to draw random samples to use in shapiro test (max capacity is 5000)
+
 Adult_sample1 <- life_history_data_adult %>% 
   sample_n(5000, replace = FALSE) 
 shapiro.test(Adult_sample1$Pred_mass_log)
+
 Adult_sample2 <- life_history_data_adult %>% 
   sample_n(5000, replace = FALSE) 
 shapiro.test(Adult_sample2$Pred_mass_log)
+
 Adult_sample3 <- life_history_data_adult %>% 
   sample_n(5000, replace = FALSE) 
 shapiro.test(Adult_sample3$Pred_mass_log)
+
 Adult_sample4 <- life_history_data_adult %>% 
   sample_n(5000, replace = FALSE) 
 shapiro.test(Adult_sample4$Pred_mass_log)
+
 Adult_sample5 <- life_history_data_adult %>% 
   sample_n(5000, replace = FALSE) 
 shapiro.test(Adult_sample5$Pred_mass_log)
+
 Adult_sample6 <- life_history_data_adult %>% 
   sample_n(5000, replace = FALSE) 
 shapiro.test(Adult_sample6$Pred_mass_log)
-```
 
-```{r}
 Adult_sample6 <- life_history_data_adult %>% 
   sample_n(5000, replace = FALSE) 
 shapiro.test(Adult_sample6$Prey_mass_log)
+
 Adult_sample7 <- life_history_data_adult %>% 
   sample_n(5000, replace = FALSE) 
 shapiro.test(Adult_sample7$Prey_mass_log)
+
 Adult_sample8 <- life_history_data_adult %>% 
   sample_n(5000, replace = FALSE) 
 shapiro.test(Adult_sample8$Prey_mass_log)
+
 Adult_sample9 <- life_history_data_adult %>% 
   sample_n(5000, replace = FALSE) 
 shapiro.test(Adult_sample9$Prey_mass_log)
+
 Adult_sample10 <- life_history_data_adult %>% 
   sample_n(5000, replace = FALSE) 
 shapiro.test(Adult_sample10$Prey_mass_log)
 ```
-
+### Normality of juveniles to use in sample
 
 ```{r}
 Juve_sample1 <- life_history_data_juvenile %>%  #significant
   sample_n(5000, replace = FALSE)
 shapiro.test(Juve_sample1$Pred_mass_log)
+
 Juve_sample2 <- life_history_data_juvenile %>%  # significant
   sample_n(5000, replace = FALSE)
 shapiro.test(Juve_sample2$Pred_mass_log)
+
 Juve_sample3 <- life_history_data_juvenile %>%  # significant
   sample_n(5000, replace = FALSE)
 shapiro.test(Juve_sample3$Pred_mass_log)
+
 Juve_sample4 <- life_history_data_juvenile %>%  # significant
   sample_n(5000, replace = FALSE)
 shapiro.test(Juve_sample4$Pred_mass_log)
+
 Juve_sample5 <- life_history_data_juvenile %>%  # significant
   sample_n(5000, replace = FALSE)
 shapiro.test(Juve_sample5$Pred_mass_log)
-```
 
-```{r}
 Juve_sample6 <- life_history_data_juvenile %>%  #significant
   sample_n(5000, replace = FALSE)
 shapiro.test(Juve_sample6$Prey_mass_log)
+
 Juve_sample7 <- life_history_data_juvenile %>%  #significant
   sample_n(5000, replace = FALSE)
 shapiro.test(Juve_sample7$Prey_mass_log)
+
 Juve_sample8 <- life_history_data_juvenile %>%  #significant
   sample_n(5000, replace = FALSE)
 shapiro.test(Juve_sample8$Prey_mass_log)
+
 Juve_sample9 <- life_history_data_juvenile %>%  #significant
   sample_n(5000, replace = FALSE)
 shapiro.test(Juve_sample9$Prey_mass_log)
+
 Juve_sample10 <- life_history_data_juvenile %>%  #significant
   sample_n(5000, replace = FALSE)
 shapiro.test(Juve_sample10$Prey_mass_log)
 ```
 
-
-
+### Normality of larva
 
 ```{r}
 shapiro.test(life_history_data_larva$Pred_mass_log)
 shapiro.test(life_history_data_larva$Prey_mass_log)
 ```
-
-
-
-
-```{r fig.height=6, fig.width = 10}
-life_history_data %>% 
-  filter(Predator.lifestage != "juvenile") %>% 
-  ggplot( aes( x = Predator.lifestage, y = Prey_Pred_mass_l)) + geom_boxplot(colour = c("red", "blue")) + theme_classic() + labs(y = "log(Prey mass/ Predator mass))", x = "Predator lifestage")
-```
-
