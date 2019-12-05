@@ -167,4 +167,149 @@ results <- read_csv("Results-mymatrix.txt")
 plotweb(col=c("red", "green", "blue"), radii=c(5,5, 5))
     # will need to change col and radii for number of interactions (see results)
 
+```
 
+
+# Function to get interactions for each site
+
+```{r}
+interactions <- function(data, location) {
+  # function returns total number of interactions in a foodweb
+  
+  # Create matrix
+  mat <- fill_matrix(data, location)
+  
+  # Write as text file
+  write.table(mat, file="mymatrix.txt", row.names=FALSE, col.names=FALSE, sep = ",")
+  
+  # Analyze text matrix
+  analyse.single(filename="mymatrix.txt")
+  
+  # Open results
+  results <- read_csv("Results-mymatrix.txt", col_types = cols())
+  L <- results$`Total # Links`
+  SR <- results$`Species richness`
+  C <- results$Connectance
+  
+  df <- data.frame(location, L, SR, C)
+  # return total number of links
+  return(df)
+  
+}
+
+```
+
+
+## Get the interactions for each site
+```{r}
+sites <- as.vector(unique(aquamarine$`Geographic location`)) # vector for all the sites
+inter <- data.frame() # data frame to hold interactions
+
+for(s in sites){
+  
+  # Calculate number of interactions
+  temp_interaction <- interactions(aquamarine, s)
+  
+  # Save to vector
+  inter <- rbind(inter, temp_interaction) 
+  
+}
+
+# Data set of all the interactions
+inter
+```
+
+## Testing for Normality in the dataset
+
+```{r}
+# Connectance
+shapiro.test(inter$C)
+
+# Links
+shapiro.test(inter$L)
+
+# Species Richness
+shapiro.test(inter$SR)
+```
+
+All of these results were significant, therefore none of them exhibit normality. This is likely due to the dataset having only 25 points for each
+
+
+
+# Plots
+```{r}
+
+# Link-scaling species law assumption 1
+  # SR is inversely proportional to connectance
+ggplot(aes(x = SR, y = 1/C), data = inter) +
+  geom_point() +
+  theme_classic() +
+  geom_smooth(method = "lm")
+  
+ # Linear model to test it
+ summary(lm(1/C ~ SR, data = inter)) # significant; although does not follow normality assumption
+ 
+ 
+ # Link scaling law versus constant connectance
+    # 2 predator-prey interactions (L) per SR versus increasing predator-prey interactions per SR
+ ggplot(aes(x = SR, y = L), data = inter) +
+  geom_point(size = 2) +
+  geom_smooth(method = "lm") +
+  theme_classic() +
+  geom_hline(yintercept=20, linetype="dashed", color = "orange", alpha = 0.5, size = 1) +
+  geom_vline(xintercept=10, linetype="dashed", color = "orange", alpha = 0.5, size = 1) +
+  geom_hline(yintercept=40, linetype="dashed", color = "red", alpha = 0.5, size = 1) +
+  geom_vline(xintercept=20, linetype="dashed", color = "red", alpha = 0.5, size = 1) +
+  geom_hline(yintercept=80, linetype="dashed", color = "darkgreen", alpha = 0.5, size = 1) +
+  geom_vline(xintercept=40, linetype="dashed", color = "darkgreen", alpha = 0.5, size = 1)
+  
+  # Linear model
+  summary(lm(L~SR, data = inter)) # significant; although does not follow normality assumption
+      # estimate = 2.6 ~ link scaling species law
+      
+  ```
+  
+  
+  # Does food web complexity decrease with increasing latitude
+  ```{r}
+  # Use dataset with transformed Latitude from Gloria
+  aqua_lat <- aquamarine_lat %>% 
+  select(`Geographic location`, Latitude) %>% 
+  group_by(`Geographic location`, Latitude) %>% 
+  tally()
+
+  aqua_lat <- aqua_lat[-c(3),]
+  aqua_lat <- aqua_lat[-c(21),]
+  df <- data.frame(inter, aqua_lat$Latitude)
+  
+  # Latitude versus connectance
+  ggplot(aes(x = aqua_lat.Latitude, y = C), data = df) +
+  geom_point(size = 3) +
+  theme_classic() +
+  labs(x = "Latitude")
+  
+    # Linear model
+    summary(lm(C~aqua_lat.Latitude, data = df)) # no significant relationship
+    
+  # Latitude versus species richness ~ test well-known SR distribution of higher SR at lower latitudes
+  ggplot(aes(x = aqua_lat$Latitude, y = SR), data = df) +
+  geom_point(colour = "black", size = 3) +
+  theme_classic() +
+  labs(x = "Latitude")
+   
+      # Linear model
+      summary(lm(SR~aqua_lat.Latitude, data = df)) # not significant
+      
+  
+  # Links & SR versus Latitude
+  ggplot(aes(x = aqua_lat$Latitude, y = SR), data = df) +
+  geom_point(colour = "black", alpha = 0.5, size = 3) +
+  geom_point(aes(y = L), colour = "red", alpha = 0.5, size = 3) +
+  theme_classic() +
+  labs(x = "Latitude")
+  ```
+ 
+  
+  
+  
+ 
