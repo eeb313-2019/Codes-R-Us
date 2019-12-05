@@ -13,7 +13,6 @@ The package requires a binary matrix where:
   4. Converted to text file with commas as separaters
 
 
-
 ## Importing the dataset
 
 ```{r}
@@ -30,13 +29,11 @@ View(aquamarine)
 ```
 
 
-
-
 ## Creating the matrix
 
 #### Getting a list of species
 
-Step 1: Create a function a list of species given the data, location, and trophic level (will be used later to fill the matrix)
+Step 1: Create a function of a list of species given the data, location, and trophic level (will be used later to fill the matrix)
 
 ```{r}
 # Function extract predators or prey given a location
@@ -44,10 +41,10 @@ get_trophic <- function(data, location, trophic){
   
   data_trophic <- data %>% 
     
-  # filter out by location
+  # Filter out by location
     filter(`Geographic location` == location)
     
-  # filter out by trophic level  
+  # Filter out by trophic level  
   if(trophic == "Prey"){
     data_trophic <- data_trophic %>% 
       dplyr::select(Prey) %>% 
@@ -77,24 +74,23 @@ Step 2: Create a function that returns a list of all species at a given location
 # Get all species from a location
 get_species <- function(data, location) {
 
-  # list of predators
+  # List of predators
   pred <- get_trophic(data, location, "Predator")
   
-  # list of prey
+  # List of prey
   prey <- get_trophic(data, location, "Prey")
   
-  # combine the two
+  # Combine the two
   species <- union(pred, prey)
   return(species)
 }
-
 
 # Test
 get_species(aquamarine, "Antarctic Peninsula")
 ```
 
 
-#### Getting list of prey for each predator
+#### Getting a list of prey for each predator
 
 Step 3: Get a list of items a predator eats, given a location and predator (will be used later to fill the  matrix)
 
@@ -102,18 +98,17 @@ Step 3: Get a list of items a predator eats, given a location and predator (will
 # Get prey items of a predator
 get_prey <- function(data, location, predator){
   
-  # filter for location and given predator
+  # Filter for location and given predator
   prey_data <- data %>% 
     filter(`Geographic location` == location) %>% 
     dplyr::select(Predator, Prey) %>% 
     dplyr::filter(Predator == predator) %>% 
     unique
   
-  # return the names of all the prey it eats
+  # Return the names of all the prey it eats
   prey <- as.vector(prey_data$Prey)
   return(prey)
 }
-
 
 # Test
 get_prey(aquamarine, "Antarctic Peninsula", "Nototheniops larseni")
@@ -129,16 +124,15 @@ Step 4: Create an empty matrix that contains n rows and n columns, where n is th
 
 make_matrix <- function(data, location){
 
-  # get all the species of location using function created in step 2
+  # Get all the species of location using function created in step 2
   sp <- get_species(data, location)
   
-  # create matrix where n column represents the same species as n row
+  # Create matrix where n column represents the same species as n row
   m <- matrix(0L, nrow = length(sp), ncol = length(sp))
   rownames(m) <- sp
   colnames(m) <- sp
   return(m)
 }
-
 ```
 
 #### Filling in the matrix
@@ -155,10 +149,10 @@ fill_matrix <- function(data, location){
   # Get list of predators using function from step 1
   predators <- get_trophic(data, location, "Predator")
   
-  # for each predator 
+  # For each predator 
   for(pred in predators){
     
-    #Get its prey species using function from step 3
+    # Get its prey species using function from step 3
     prey_species <- get_prey(aquamarine, location, pred)
     
     # Assign each value of matrix[prey, predator] = 1
@@ -169,7 +163,6 @@ fill_matrix <- function(data, location){
   return(m)
 }
 
-
 # Test
 fill_matrix(aquamarine, "Antarctic Peninsula")
 ```
@@ -177,7 +170,7 @@ fill_matrix(aquamarine, "Antarctic Peninsula")
 
 ## Creating the food web and analysing diversity
 
-Below is exploratory code from trying to figure out how to analyse each matrix specifically. This is automated further down in the file
+Below is exploratory code from trying to figure out how to analyze each matrix specifically. This is automated further down in the file
 
 ```{r}
 # The matrix file
@@ -186,13 +179,13 @@ mat <- fill_matrix(aquamarine, "Antarctic Peninsula")
 # Converting to txt file
 write.table(mat, file="mymatrix.txt", row.names=FALSE, col.names=FALSE, sep = ",") # saved in directory
 
-# analyse interactions
+# Analyse interactions
 analyse.single(filename="mymatrix.txt")
 
-# reading results of analyse signal
+# Reading results of analyse signal
 results <- read_csv("Results-mymatrix.txt")
 
-# plot web
+# Plot web
 plotweb(col=c("red", "green", "blue"), radii=c(5,5, 5))
     # will need to change col and radii for number of interactions (see results)
 
@@ -205,7 +198,7 @@ Step 7: Create a function that returns a dataframe with number of links (L), con
 
 ```{r}
 interactions <- function(data, location) {
-  # function returns total number of interactions in a foodweb
+  # Function returns total number of interactions in a foodweb
   
   # Create matrix
   mat <- fill_matrix(data, location)
@@ -223,11 +216,10 @@ interactions <- function(data, location) {
   C <- results$Connectance
   
   df <- data.frame(location, L, SR, C)
-  # return total number of links
+  # Return total number of links
   return(df)
   
 }
-
 ```
 
 
@@ -271,7 +263,6 @@ shapiro.test(inter$SR)
 All of these results were significant, therefore none of them exhibit normality. This is likely due to the dataset having only 25 points for each
 
 
-
 # Plots
 
 ```{r}
@@ -287,7 +278,6 @@ ggplot(aes(x = SR, y = 1/C), data = inter) +
  # Linear model to test it
  
  summary(lm(1/C ~ SR, data = inter)) # significant; although does not follow normality assumption
- 
  
  # Link scaling law versus constant connectance
  
@@ -308,52 +298,48 @@ ggplot(aes(x = SR, y = 1/C), data = inter) +
   
   summary(lm(L~SR, data = inter)) # significant; although does not follow normality assumption
   
-      # estimate = 2.6 ~ link scaling species law
-      
+      # Estimate = 2.6 ~ link scaling species law
   ```
   
   
-  # Does food web complexity decrease with increasing latitude
+ # Does food web complexity decrease with increasing latitude
   
-  ```{r}
-  # Use dataset with transformed Latitude from Gloria
-  aqua_lat <- aquamarine_lat %>% 
-  select(`Geographic location`, Latitude) %>% 
-  group_by(`Geographic location`, Latitude) %>% 
-  tally()
+ ```{r}
+ # Use dataset with transformed Latitude from Gloria
+ aqua_lat <- aquamarine_lat %>% 
+ select(`Geographic location`, Latitude) %>% 
+ group_by(`Geographic location`, Latitude) %>% 
+ tally()
 
-  aqua_lat <- aqua_lat[-c(3),]
-  aqua_lat <- aqua_lat[-c(21),]
-  df <- data.frame(inter, aqua_lat$Latitude)
+ aqua_lat <- aqua_lat[-c(3),]
+ aqua_lat <- aqua_lat[-c(21),]
+ df <- data.frame(inter, aqua_lat$Latitude)
   
-  # Latitude versus connectance
-  ggplot(aes(x = aqua_lat.Latitude, y = C), data = df) +
-  geom_point(size = 3) +
-  theme_classic() +
-  labs(x = "Latitude")
+ # Latitude versus connectance
+ ggplot(aes(x = aqua_lat.Latitude, y = C), data = df) +
+ geom_point(size = 3) +
+ theme_classic() +
+ labs(x = "Latitude")
   
-    # Linear model
-    summary(lm(C~aqua_lat.Latitude, data = df)) # no significant relationship
+ # Linear model
+ 
+ summary(lm(C~aqua_lat.Latitude, data = df)) # no significant relationship
     
-  # Latitude versus species richness ~ test well-known SR distribution of higher SR at lower latitudes
-  ggplot(aes(x = aqua_lat$Latitude, y = SR), data = df) +
-  geom_point(colour = "black", size = 3) +
-  theme_classic() +
-  labs(x = "Latitude")
+ # Latitude versus species richness ~ test well-known SR distribution of higher SR at lower latitudes
+ ggplot(aes(x = aqua_lat$Latitude, y = SR), data = df) +
+ geom_point(colour = "black", size = 3) +
+ theme_classic() +
+ labs(x = "Latitude")
    
-      # Linear model
-      summary(lm(SR~aqua_lat.Latitude, data = df)) # not significant
+ # Linear model
+ 
+ summary(lm(SR~aqua_lat.Latitude, data = df)) # not significant
       
   
-  # Links & SR versus Latitude
-  ggplot(aes(x = aqua_lat$Latitude, y = SR), data = df) +
-  geom_point(colour = "black", alpha = 0.5, size = 3) +
-  geom_point(aes(y = L), colour = "red", alpha = 0.5, size = 3) +
-  theme_classic() +
-  labs(x = "Latitude")
+ # Links & SR versus Latitude
+ ggplot(aes(x = aqua_lat$Latitude, y = SR), data = df) +
+ geom_point(colour = "black", alpha = 0.5, size = 3) +
+ geom_point(aes(y = L), colour = "red", alpha = 0.5, size = 3) +
+ theme_classic() +
+ labs(x = "Latitude")
   ```
- 
-  
-  
-  
- 
