@@ -35,3 +35,25 @@ Responsibilities: Create a beautiful report and keep the big picture in mind.
 Skills: Writing, presenting.
 
 Responsibilities: Editing final report, motivator
+
+
+# Contents of folders
+
+The first page of the Codes R Us Github repository has:
+  
+  - ReadMe File: Contains project information, data description, information about the group members, and key to the rest of the repo
+  
+  - Conduct File: Contains the Codes R Us code of conduct, group member responsibilities, and plans to resolve conflict should they arise
+  
+  - Foodweb Code File: file containing code for the food web complexity analysis 
+  
+  - Exploratory Analysis with Life Stage Code: file containing code for the analysis between predator:prey mass and life stage
+  
+ Within the opening repo, there is also a 'doc' folder (short for documents). This folder contains
+ 
+  - Objectives File: outlines our hypothesis and predictions for this project
+
+  - Analysis Plan: contains how we plan to address each question, our predicted results, and possible figures we will produce.
+  
+  - Folder called plots, which contains a folder called mock, which contains: mock plots matching our original questions
+  
