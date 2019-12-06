@@ -39,7 +39,7 @@ Responsibilities: Editing final report, motivator
 
 # Contents 
 
-Master contains 3 separate code files, Bergmann's rule, Predator Prey interactions, and Food webs.
+Master contains 3 separate code files, Bergmann's rule, Predator Prey interactions, and Food webs as well as the final report. 
 
 # Contents of folders
 
