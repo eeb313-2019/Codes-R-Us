@@ -1,0 +1,61 @@
+ November 19 Meeting Minutes
+
+- Leader: Mariel
+- Recorder: Josh
+- Organizer: Sebastian
+- Day Off: Gloria
+
+Figure out to-do list and split up roles.
+
+Q1 - Diverse communities / diverse interactions
+
+Calculate simpson's diversity index
+Use matrix function convert to text file
+Create food web
+
+Q2 - Pred prey mass ratio by life stage
+
+Log transform data for pred/prey mass
+Apply linear models
+
+Q3 - Bergmann's rule
+
+Create a lat, species, and size table
+General linear model
+
+Q4 - Total abundance with depth
+
+Log transform data
+Apply linear models
+
+We are no longer going to investigate Q4 (depth relationships) as the depths do not vary much or at all within studies, leading to enourmous bias.
+
+Lost code:
+
+
+```{r}
+install.packages('tidyverse')
+
+library(tidyverse)
+
+aquamarine <- Predator_and_prey_body_sizes_in_marine_food_webs_vsn4.txt
+
+aquamarine_depth <- aquamarine %>%  select(Predator, 
+                       Standardised.predator.length, 
+                       SI.predator.mass, 
+                       Depth, 
+                       Latitude, 
+                       Type.of.feeding.interaction) %>% 
+                filter(!is.na(Depth)) # One depth value was NA
+
+aquamarine_abundance <- aquamarine_depth%>% 
+  select(Predator, Depth) %>% 
+  group_by(Predator, Depth) %>% 
+  summarize(abund = n())
+
+aquamarine_abundance <-arrange(aquamarine_abundance, Depth)
+
+aquamarine_abundance %>% 
+  ggplot(aes(x= Depth, y=abund)) + 
+  geom_point(size=3)
+```
